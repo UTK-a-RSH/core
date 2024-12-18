@@ -105,21 +105,19 @@ export class SmtPad extends PrimitiveComponent<typeof smtPadProps> {
         pcb_smtpad_id: pcb_smtpad.pcb_smtpad_id,
       })
     } else if (props.shape === "rect") {
+      const isStandardRectRotation = [0, 90, 180, 270].includes(parentRotation);
       pcb_smtpad =
-        parentRotation === 0 || isRotated90
+        isStandardRectRotation
           ? db.pcb_smtpad.insert({
               pcb_component_id,
-              pcb_port_id: this.matchedPort?.pcb_port_id!, // port likely isn't matched
+              pcb_port_id: this.matchedPort?.pcb_port_id!,
               layer: maybeFlipLayer(props.layer ?? "top"),
               shape: "rect",
-
               ...{
                 width: isRotated90 ? props.height : props.width,
                 height: isRotated90 ? props.width : props.height,
               },
-
               port_hints: props.portHints.map((ph) => ph.toString()),
-
               x: position.x,
               y: position.y,
             })
@@ -132,7 +130,7 @@ export class SmtPad extends PrimitiveComponent<typeof smtPadProps> {
               y: position.y,
               ccw_rotation: parentRotation,
               port_hints: props.portHints.map((ph) => ph.toString()),
-            } as PcbSmtPad)
+            } as PcbSmtPad);
       if (pcb_smtpad.shape === "rect")
         db.pcb_solder_paste.insert({
           layer: pcb_smtpad.layer,
